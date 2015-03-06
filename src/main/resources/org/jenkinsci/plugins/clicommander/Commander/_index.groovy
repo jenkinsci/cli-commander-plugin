@@ -38,12 +38,16 @@ l.layout(title: my.displayName, permission: app.READ) {
                 div(class: "error") { text(error); }
             }
 
-            input(type: "text", name: "commandLine", style: "width: 90%", placeholder: "Command", value: request.getParameter("commandLine"));
-            f.submit(type: "submit", value: _("Run"));
+            f.textbox(
+                name: "commandLine",
+                placeholder: "Command",
+                value: request.getParameter("commandLine"),
+                autoCompleteUrl: "${rootURL}/${my.urlName}/autoCompleteCommandLine"
+            );
 
             def stdout = request.getAttribute("stdout");
             if (stdout) {
-                h2("Stdout");
+                h2("stdout:");
                 pre(style: "color: white; background-color: black; padding: 1em; font-weight: bold") {
                     text stdout;
                 }
@@ -51,7 +55,7 @@ l.layout(title: my.displayName, permission: app.READ) {
 
             def stderr = request.getAttribute("stderr");
             if (stderr) {
-                h2("Stderr");
+                h2("stderr:");
                 pre(style: "color: red; background-color: black; padding: 1em; font-weight: bold") {
                     text stderr;
                 }

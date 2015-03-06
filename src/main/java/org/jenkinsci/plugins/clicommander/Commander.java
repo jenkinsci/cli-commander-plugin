@@ -24,8 +24,10 @@
 package org.jenkinsci.plugins.clicommander;
 
 import hudson.Extension;
+import hudson.Functions;
 import hudson.Util;
 import hudson.cli.CLICommand;
+import hudson.model.AutoCompletionCandidates;
 import hudson.model.RootAction;
 
 import java.io.ByteArrayInputStream;
@@ -106,5 +108,20 @@ public class Commander implements RootAction {
 
         args.remove(0);
         return args;
+    }
+
+    @Restricted(NoExternalUse.class)
+    public AutoCompletionCandidates doAutoCompleteCommandLine(@QueryParameter String value) {
+        AutoCompletionCandidates candidates = new AutoCompletionCandidates();
+        // Completion works for command names only
+        if (value.contains(" ")) return candidates;
+
+        for (CLICommand command: Functions.getCLICommands()) {
+            if (command.getName().startsWith(value)) {
+                candidates.add(command.getName());
+            }
+        }
+
+        return candidates;
     }
 }
