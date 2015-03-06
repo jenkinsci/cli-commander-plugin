@@ -23,39 +23,18 @@
  */
 package org.jenkinsci.plugins.clicommander;
 
+import java.util.concurrent.SynchronousQueue.LifoWaitQueue;
+
 def l = namespace(lib.LayoutTagLib);
 def t = namespace(lib.JenkinsTagLib);
 def f = namespace(lib.FormTagLib);
 def st = namespace("jelly:stapler");
 
-l.layout(title: my.displayName, permission: app.READ) {
-    st.include(page: "sidepanel");
-    l.main_panel {
-        h1(my.displayName);
-        form(method: "POST", action: "${rootURL}/${my.urlName}/") {
-            def error = request.getAttribute("error");
-            if (error) {
-                div(class: "error") { text(error); }
-            }
-
-            input(type: "text", name: "commandLine", style: "width: 90%", placeholder: "Command", value: request.getParameter("commandLine"));
-            f.submit(type: "submit", value: _("Run"));
-
-            def stdout = request.getAttribute("stdout");
-            if (stdout) {
-                h2("Stdout");
-                pre(style: "color: white; background-color: black; padding: 1em; font-weight: bold") {
-                    text stdout;
-                }
-            }
-
-            def stderr = request.getAttribute("stderr");
-            if (stderr) {
-                h2("Stderr");
-                pre(style: "color: red; background-color: black; padding: 1em; font-weight: bold") {
-                    text stderr;
-                }
-            }
+l.side_panel {
+    dl {
+        for (command in h.getCLICommands()) {
+            dt(command.name);
+            dd(command.shortDescription);
         }
     }
 }
