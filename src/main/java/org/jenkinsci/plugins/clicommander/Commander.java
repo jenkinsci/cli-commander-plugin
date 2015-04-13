@@ -29,6 +29,8 @@ import hudson.Util;
 import hudson.cli.CLICommand;
 import hudson.model.AutoCompletionCandidates;
 import hudson.model.RootAction;
+import hudson.model.User;
+import hudson.security.ACL;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -69,24 +71,37 @@ public class Commander implements RootAction {
     }
 
     public void doIndex(
-            StaplerRequest req, StaplerResponse res, @QueryParameter String commandLine
+            StaplerRequest req, StaplerResponse res, final @QueryParameter String commandLine
     ) throws ServletException, IOException {
 
         if ("POST".equals(req.getMethod())) {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final ByteArrayOutputStream err = new ByteArrayOutputStream();
+            final ByteArrayInputStream in = new ByteArrayInputStream(new byte[] {});
+            User user = User.current();
+
             try {
+                final CLICommand command = getCommand(commandLine);
+                Runnable execute = new Runnable() {
+                    public void run() {
+                        command.main(getArgs(commandLine), Locale.US, in, new PrintStream(out), new PrintStream(err));
+                    }
+                };
 
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                ByteArrayOutputStream err = new ByteArrayOutputStream();
-                ByteArrayInputStream in = new ByteArrayInputStream(new byte[] {});
+                if (user == null) {
+                    execute.run();
+                } else {
+                    command.setTransportAuth(user.impersonate());
+                    ACL.impersonate(user.impersonate(), execute);
+                }
 
-                CLICommand command = getCommand(commandLine);
-                command.main(getArgs(commandLine), Locale.US, in, new PrintStream(out), new PrintStream(err));
                 req.setAttribute("stdout", out.toString());
                 req.setAttribute("stderr", err.toString());
             } catch (IllegalArgumentException ex) {
                 req.setAttribute("error", ex.getMessage());
             }
         }
+
         req.getView(this, "_index").forward(req, res);
     }
 
@@ -102,7 +117,7 @@ public class Commander implements RootAction {
         return command;
     }
 
-    private List<String> getArgs(String commandLine) {
+    private List<String> getArgs(String commandLine) throws IllegalArgumentException {
         List<String> args = new ArrayList<String>(Arrays.asList(commandLine.split("\\s+")));
         if (args.size() == 0) throw new IllegalArgumentException("No command provided");
 

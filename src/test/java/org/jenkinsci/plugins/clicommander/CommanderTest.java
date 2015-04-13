@@ -31,6 +31,7 @@ import static org.junit.Assert.assertNull;
 
 import java.net.URL;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -47,6 +48,12 @@ public class CommanderTest {
     @Rule public JenkinsRule j = new JenkinsRule();
 
     private String out, err;
+    private WebClient wc;
+
+    @Before
+    public void setUp() {
+        wc = j.createWebClient();
+    }
 
     @Test
     public void runCommand() throws Exception {
@@ -59,8 +66,6 @@ public class CommanderTest {
     public void csrf() throws Exception {
         j.createFreeStyleProject("delete");
         j.createFreeStyleProject("keep");
-
-        WebClient wc = j.createWebClient();
 
         URL url = new URL(j.getURL(), "clicommander/?commandLine=delete-job delete");
         WebRequestSettings req = new WebRequestSettings(url, HttpMethod.POST);
@@ -75,8 +80,18 @@ public class CommanderTest {
         assertNotNull(j.jenkins.getItem("keep"));
     }
 
+    @Test
+    public void useCorrectAuthentication() throws Exception {
+        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
+
+        wc.login("jdoe", "jdoe");
+
+        run("who-am-i");
+        assertThat(err, equalTo(null));
+        assertThat(out, containsString("Authenticated as: jdoe Authorities: authenticated"));
+    }
+
     public void run(String commands) throws Exception {
-        WebClient wc = j.createWebClient();
         HtmlPage page = wc.goTo("clicommander");
         HtmlForm form = page.getFormByName("clicommander");
 
@@ -86,7 +101,6 @@ public class CommanderTest {
 
         form.getInputByName("commandLine").setValueAttribute(commands);
         page = submit.click();
-
         final HtmlElement stdout = page.getElementById("stdout");
         final HtmlElement stderr = page.getElementById("stderr");
         out = stdout == null ? null : stdout.asText();
