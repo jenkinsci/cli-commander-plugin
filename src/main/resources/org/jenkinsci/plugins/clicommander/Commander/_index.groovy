@@ -32,7 +32,7 @@ l.layout(title: my.displayName, permission: app.READ) {
     st.include(page: "sidepanel");
     l.main_panel {
         h1(my.displayName);
-        form(method: "POST", action: "${rootURL}/${my.urlName}/") {
+        form(method: "POST", action: "${rootURL}/${my.urlName}/", name: "clicommander") {
             def error = request.getAttribute("error");
             if (error) {
                 div(class: "error") { text(error); }
@@ -48,7 +48,7 @@ l.layout(title: my.displayName, permission: app.READ) {
             def stdout = request.getAttribute("stdout");
             if (stdout) {
                 h2("stdout:");
-                pre(style: "color: white; background-color: black; padding: 1em; font-weight: bold") {
+                pre(id: "stdout", style: "color: white; background-color: black; padding: 1em; font-weight: bold") {
                     text stdout;
                 }
             }
@@ -56,7 +56,7 @@ l.layout(title: my.displayName, permission: app.READ) {
             def stderr = request.getAttribute("stderr");
             if (stderr) {
                 h2("stderr:");
-                pre(style: "color: red; background-color: black; padding: 1em; font-weight: bold") {
+                pre(id: "stderr", style: "color: red; background-color: black; padding: 1em; font-weight: bold") {
                     text stderr;
                 }
             }
