@@ -8,7 +8,7 @@
 
   <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>cli-commander</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.2</version>
   <packaging>hpi</packaging>
   <name>CLI Commander Plugin</name>
   <description>Run CLI commands from Jenkins UI</description>
@@ -26,7 +26,7 @@
     <connection>scm:git:git://github.com/jenkinsci/cli-commander-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/cli-commander-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/cli-commander-plugin</url>
-    <tag>HEAD</tag>
+    <tag>cli-commander-0.2</tag>
   </scm>
 
   <dependencies>
