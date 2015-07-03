@@ -60,6 +60,11 @@ import org.kohsuke.stapler.StaplerResponse;
 @Restricted(NoExternalUse.class)
 public class Commander implements RootAction {
 
+    // Command knows not to work
+    private static final List<String> commandBlacklist = Arrays.asList(
+        "groovysh"
+    );
+
     public String getUrlName() {
         return "clicommander";
     }
@@ -113,6 +118,10 @@ public class Commander implements RootAction {
         if (Util.fixEmptyAndTrim(commandLine) == null || args.size() == 0) {
             throw new IllegalArgumentException("No command provided");
         }
+
+        if (commandBlacklist.contains(args.get(0))) throw new IllegalArgumentException(
+                "Command '" + args.get(0) + "' is not supported"
+        );
 
         CLICommand command = CLICommand.clone(args.get(0));
         if (command == null) throw new IllegalArgumentException("There is no such command: " + args.get(0));
