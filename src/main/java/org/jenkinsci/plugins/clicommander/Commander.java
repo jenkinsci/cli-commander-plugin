@@ -43,6 +43,8 @@ import java.util.Locale;
 
 import javax.servlet.ServletException;
 
+import jenkins.model.Jenkins;
+
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.QueryParameter;
@@ -67,7 +69,8 @@ public class Commander implements RootAction {
     }
 
     public String getIconFileName() {
-        return null;
+        Jenkins.getInstance().checkPermission(Jenkins.READ);
+        return "terminal.png";
     }
 
     public void doIndex(
