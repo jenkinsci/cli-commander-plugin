@@ -37,11 +37,11 @@ import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
-import com.gargoylesoftware.htmlunit.HttpMethod;
-import com.gargoylesoftware.htmlunit.WebRequestSettings;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.HttpMethod;
+import org.htmlunit.WebRequestSettings;
+import org.htmlunit.html.HtmlElement;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
 
 public class CommanderTest {
 
@@ -99,7 +99,7 @@ public class CommanderTest {
         submit.setAttribute("type", "submit");
         form.appendChild(submit);
 
-        form.getInputByName("commandLine").setValueAttribute(commands);
+        form.getInputByName("commandLine").setValue(commands);
         page = submit.click();
         final HtmlElement stdout = page.getElementById("stdout");
         final HtmlElement stderr = page.getElementById("stderr");
